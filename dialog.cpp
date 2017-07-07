@@ -391,7 +391,7 @@ void Dialog::on_load_3_clicked()
     start_num_3 = ui->lineEdit_NUM_3->text().toInt();
     mydir = new QDir(imageDir_3);
     QStringList filter;
-    filter<<"*.JPEG";
+    filter<<"*.JPEG"<<"*.jpg"<<"*.png";
     mydir->setNameFilters(filter);
     fileInfo = new  QList<QFileInfo>(mydir->entryInfoList(filter));
     all_num_3 = fileInfo->count();
@@ -415,87 +415,154 @@ void Dialog::showImage_3()
     QImage src =  QImage(filename);
     QString imgName = qfile.fileName();
 
-    QString name = imgName.split('.').at(0).trimmed();
-    QString annoFileName = AnnoDir_3 + "/" + name + ".xml";
-    QFile xmlfile(annoFileName);
-
-//    QTextCodec *codec = QTextCodec::codecForName("utf-8");
-//    QTextCodec::setCodecForLocale(codec);
-//    QTextCodec::setCodecForCStrings(codec);
-//    QTextCodec::setCodecForTr(codec);
-
-    if (! xmlfile.open(QIODevice::ReadOnly|QIODevice::Text))
+    if (ui->radioButton_xml->isChecked())
     {
-        cout<<annoFileName.toStdString()<<endl;
-        cout<<"error! can't find the file"<<endl;
-//        QMessageBox::warning(NULL,"open","open file failed");
-//        QImage image = src.scaled(Image_Width,Image_Height,Qt::KeepAspectRatio);
-         ui->label_fullImage_3->setPixmap(QPixmap::fromImage(src));
-         ui->name1_3->setText(imgName);
-        return;
-    }
-    QDomDocument doc;
-    if (! doc.setContent( &xmlfile ) )
-    {
-        cout<<"close"<<endl;
-        xmlfile.close();
-        return;
-    }
-    QDomElement root = doc.documentElement();
-    QDomNode objectNode=root.firstChild().nextSibling().nextSibling().nextSibling().nextSibling().nextSibling();
 
-    QList<Food> classList;
-    QPainter painter(&src);
+        QString name = imgName.split('.').at(0).trimmed();
+        QString annoFileName = AnnoDir_3 + "/" + name + ".xml";
+        QFile xmlfile(annoFileName);
 
-    while (! objectNode.isNull() )
-    {
-        QDomNode node = objectNode.firstChild();
-        QString name = node.toElement().text();
-        node = node.nextSibling();
-        QString pose = node.toElement().text();
-        node = node.nextSibling();
-        QString truncated = node.toElement().text();
-        node = node.nextSibling();
-        int difficult = node.toElement().text().toInt();
-//        if (difficult !=0)
-//        {
-//            cout<<difficult<<endl;
-//            QMessageBox::warning(NULL,"difficult","difficult");
-//        }
-        node = node.nextSibling().firstChild();
-        int x1 = node.toElement().text().toInt();
-        node = node.nextSibling();
-        int y1 = node.toElement().text().toInt();
-        node = node.nextSibling();
-        int x2 = node.toElement().text().toInt();
-        node = node.nextSibling();
-        int y2 = node.toElement().text().toInt();
-        Food objFood(x1,y1,x2,y2,name);
-        classList.append(objFood);
+    //    QTextCodec *codec = QTextCodec::codecForName("utf-8");
+    //    QTextCodec::setCodecForLocale(codec);
+    //    QTextCodec::setCodecForCStrings(codec);
+    //    QTextCodec::setCodecForTr(codec);
 
-        if(ui->checkBox_rect_3->isChecked())
+        if (! xmlfile.open(QIODevice::ReadOnly|QIODevice::Text))
         {
-            QPen pen(QColor(255,y1%255,y2%255), 3);
-            painter.setPen(pen);
-            painter.drawRect(x1,y1,x2-x1,y2-y1);
+            cout<<annoFileName.toStdString()<<endl;
+            cout<<"error! can't find the file"<<endl;
+    //        QMessageBox::warning(NULL,"open","open file failed");
+             QImage image = src.scaled(Image_Width,Image_Height,Qt::KeepAspectRatio);
+             ui->label_fullImage_3->setPixmap(QPixmap::fromImage( image ));
+             ui->name1_3->setText(imgName);
+            return;
+        }
+        QDomDocument doc;
+        if (! doc.setContent( &xmlfile ) )
+        {
+            cout<<"close"<<endl;
+            xmlfile.close();
+            return;
+        }
+        QDomElement root = doc.documentElement();
+        QDomNode objectNode=root.firstChild().nextSibling().nextSibling().nextSibling().nextSibling().nextSibling();
 
-            if(ui->checkBox_label_3->isChecked())
+        QList<Food> classList;
+        QPainter painter(&src);
+
+        while (! objectNode.isNull() )
+        {
+            QDomNode node = objectNode.firstChild();
+            QString name = node.toElement().text();
+            node = node.nextSibling();
+            QString pose = node.toElement().text();
+            node = node.nextSibling();
+            QString truncated = node.toElement().text();
+            node = node.nextSibling();
+            int difficult = node.toElement().text().toInt();
+    //        if (difficult !=0)
+    //        {
+    //            cout<<difficult<<endl;
+    //            QMessageBox::warning(NULL,"difficult","difficult");
+    //        }
+            node = node.nextSibling().firstChild();
+            int x1 = node.toElement().text().toInt();
+            node = node.nextSibling();
+            int y1 = node.toElement().text().toInt();
+            node = node.nextSibling();
+            int x2 = node.toElement().text().toInt();
+            node = node.nextSibling();
+            int y2 = node.toElement().text().toInt();
+            Food objFood(x1,y1,x2,y2,name);
+            classList.append(objFood);
+
+            if(ui->checkBox_rect_3->isChecked())
             {
-                QFont font;
-                font.setFamily("Microsoft YaHei");
-                font.setPointSize(20);
-                font.setItalic(true);
-                painter.setFont(font);
-                painter.drawText(QRect(x1,y1,150,30),Qt::AlignLeft,name);
+                QPen pen(QColor(255,y1%255,y2%255), 3);
+                painter.setPen(pen);
+                painter.drawRect(x1,y1,x2-x1,y2-y1);
+
+                if(ui->checkBox_label_3->isChecked())
+                {
+                    QFont font;
+                    font.setFamily("Microsoft YaHei");
+                    font.setPointSize(20);
+                    font.setItalic(true);
+                    painter.setFont(font);
+                    painter.drawText(QRect(x1,y1,150,30),Qt::AlignLeft,name);
+                }
             }
+
+            objectNode = objectNode.nextSibling();
+        }
+        painter.end();
+    }
+    else if(ui->radioButton_txt->isChecked())
+    {
+
+        QString name = imgName.split('.').at(0).trimmed();
+        QString annoFileName = AnnoDir_3 + "/" + name + ".txt";
+        cout<< annoFileName.toStdString() <<endl;
+        QFile annoFile(annoFileName);
+
+        if(!annoFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            cout << AnnoDir_3.toStdString()<<endl;
+            cout <<annoFileName.toStdString()<< " Open failed." << endl;
+//            QMessageBox::warning(NULL,"open","open file failed");
+            QImage image = src.scaled(Image_Width,Image_Height,Qt::KeepAspectRatio);
+            ui->label_fullImage_3->setPixmap(QPixmap::fromImage( image ));
+            ui->name1_3->setText(imgName);
+            return ;
+        }
+        QTextStream txtInput(&annoFile);
+        txtInput.setCodec("UTF-8");
+        QString lineStr;
+        QList<Food> classList;
+        int num = txtInput.readLine().trimmed().toInt();
+        QPainter painter(&src);
+
+        if (num > 0)
+        {
+            while( ! txtInput.atEnd() )
+            {
+
+                lineStr = txtInput.readLine();
+                QList<QString> lineDate= lineStr.split(' ');
+                int x1 = lineDate.at(0).trimmed().toInt();
+                int y1 = lineDate.at(1).trimmed().toInt();
+                int x2 = lineDate.at(2).trimmed().toInt();
+                int y2 = lineDate.at(3).trimmed().toInt();
+                QString classname = lineDate.at(4).trimmed();
+                Food objFood(x1,y1,x2,y2,classname);
+                classList.append(objFood);
+
+                if(ui->checkBox_rect_3->isChecked())
+                {
+                    QPen pen(QColor(255,y1%255,y2%255), 3);
+                    painter.setPen(pen);
+                    painter.drawRect(x1,y1,x2-x1,y2-y1);
+
+                    if(ui->checkBox_label_3->isChecked())
+                    {
+                        QFont font;
+                        font.setFamily("Microsoft YaHei");
+                        font.setPointSize(20);
+                        font.setItalic(true);
+                        painter.setFont(font);
+                        painter.drawText(QRect(x1,y1,150,30),Qt::AlignLeft,classname);
+                    }
+                }
+
+            }
+            painter.end();
         }
 
-        objectNode = objectNode.nextSibling();
-    }
-    painter.end();
 
-//    QImage image = src.scaled(Image_Width,Image_Height,Qt::KeepAspectRatio);
-     ui->label_fullImage_3->setPixmap(QPixmap::fromImage(src));
+    }
+
+     QImage image = src.scaled(Image_Width,Image_Height,Qt::KeepAspectRatio);
+     ui->label_fullImage_3->setPixmap(QPixmap::fromImage( image ));
      ui->name1_3->setText(imgName);
 
 }
