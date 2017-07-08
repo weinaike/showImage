@@ -8,28 +8,8 @@
 #include <QList>
 #include <QPainter>
 #include <QDomDocument>
-
-class Food
-{
-public:
-    Food(int x1_,int y1_,int x2_,int y2_,QString name_);
-public:
-    int x1;
-    int y1;
-    int x2;
-    int y2;
-    QString name;
-
-};
-Food::Food(int x1_, int y1_, int x2_, int y2_, QString name_)
-{
-    x1=x1_;
-    x2=x2_;
-    y1=y1_;
-    y2=y2_;
-    name = name_;
-}
-
+#include <QDebug>
+#include <QTableWidget>
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -42,6 +22,34 @@ Dialog::Dialog(QWidget *parent) :
     all_num_2 = 0;
     mydir = new QDir();
     fileInfo = new QList<QFileInfo>();
+    mybbox = new bbox();
+    ind = -1;
+    ui->pushButton->setEnabled(false);
+    QFile wordsfile("D:\\work\\showImage\\foodlist.txt");
+    if (wordsfile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream txtInput(&wordsfile);
+        txtInput.setCodec("UTF-8");
+        int i = 0; int j = 0;
+        while( ! txtInput.atEnd() ){
+            QString lineStr = txtInput.readLine().trimmed();
+            words_.append(lineStr);
+            QTableWidgetItem *it = new QTableWidgetItem(lineStr);
+            ui->tableWidget->setItem(i,j,it);
+            i++;
+            if (i == ui->tableWidget->rowCount() )
+            {
+                j++;
+                i=0;
+            }
+
+        }
+    }
+    else
+    {
+        qDebug()<<"words file is not exist"<<endl;
+    }
+
 }
 
 Dialog::~Dialog()
@@ -51,6 +59,7 @@ Dialog::~Dialog()
         delete mydir;
     if (!fileInfo->empty())
         fileInfo->clear();
+    delete mybbox;
 }
 
 
@@ -284,10 +293,10 @@ void Dialog::showImage_2()
     QImage src =  QImage(filename);
     QString imgName = qfile.fileName();
     QImage image = src.scaled(Image_Width,Image_Height,Qt::KeepAspectRatio);
-     ui->label_part->setPixmap(QPixmap::fromImage(image));
-     ui->name1_2->setText(imgName);
+    ui->label_part->setPixmap(QPixmap::fromImage(image));
+    ui->name1_2->setText(imgName);
 
-     showFullImage(num);
+    showFullImage(num);
 
 }
 
@@ -396,174 +405,48 @@ void Dialog::on_load_3_clicked()
     fileInfo = new  QList<QFileInfo>(mydir->entryInfoList(filter));
     all_num_3 = fileInfo->count();
     ui->lineEdit_ALL_3->setText(QString::number(all_num_3, 10));
+
+    QFileInfo qfile = fileInfo->at(start_num_3);
+    QString filename = qfile.absoluteFilePath();
+    QImage src = QImage(filename);
+    QString imgName = qfile.fileName();
+    QString name = imgName.split('.').at(0).trimmed();
+
+    QString annoFileName;
+    if (ui->radioButton_xml->isChecked())
+        annoFileName = AnnoDir_3 + "/" + name + ".xml";
+    else
+        annoFileName = AnnoDir_3 + "/" + name + ".txt";
+    mybbox = new bbox(src, annoFileName);
+    ui->name1_3->setText(imgName);
+    ind = -1;
+    ui->pushButton->setEnabled(false);
+
     showImage_3();
-
-
 }
-
 
 void Dialog::showImage_3()
 {
-
-    int num = start_num_3;
+    ui->listWidget->clear();
 
     int Image_Width=ui->label_fullImage_3->width();
     int Image_Height=ui->label_fullImage_3->height();
 
-    QFileInfo qfile = fileInfo->at(num);
-    QString filename = qfile.absoluteFilePath();
-    QImage src =  QImage(filename);
-    QString imgName = qfile.fileName();
-
-    if (ui->radioButton_xml->isChecked())
+    QList<Food> list;
+    mybbox->getList(list);
+    for(int iter = 0; iter<list.size(); iter++)
     {
-
-        QString name = imgName.split('.').at(0).trimmed();
-        QString annoFileName = AnnoDir_3 + "/" + name + ".xml";
-        QFile xmlfile(annoFileName);
-
-    //    QTextCodec *codec = QTextCodec::codecForName("utf-8");
-    //    QTextCodec::setCodecForLocale(codec);
-    //    QTextCodec::setCodecForCStrings(codec);
-    //    QTextCodec::setCodecForTr(codec);
-
-        if (! xmlfile.open(QIODevice::ReadOnly|QIODevice::Text))
-        {
-            cout<<annoFileName.toStdString()<<endl;
-            cout<<"error! can't find the file"<<endl;
-    //        QMessageBox::warning(NULL,"open","open file failed");
-             QImage image = src.scaled(Image_Width,Image_Height,Qt::KeepAspectRatio);
-             ui->label_fullImage_3->setPixmap(QPixmap::fromImage( image ));
-             ui->name1_3->setText(imgName);
-            return;
-        }
-        QDomDocument doc;
-        if (! doc.setContent( &xmlfile ) )
-        {
-            cout<<"close"<<endl;
-            xmlfile.close();
-            return;
-        }
-        QDomElement root = doc.documentElement();
-        QDomNode objectNode=root.firstChild().nextSibling().nextSibling().nextSibling().nextSibling().nextSibling();
-
-        QList<Food> classList;
-        QPainter painter(&src);
-
-        while (! objectNode.isNull() )
-        {
-            QDomNode node = objectNode.firstChild();
-            QString name = node.toElement().text();
-            node = node.nextSibling();
-            QString pose = node.toElement().text();
-            node = node.nextSibling();
-            QString truncated = node.toElement().text();
-            node = node.nextSibling();
-            int difficult = node.toElement().text().toInt();
-    //        if (difficult !=0)
-    //        {
-    //            cout<<difficult<<endl;
-    //            QMessageBox::warning(NULL,"difficult","difficult");
-    //        }
-            node = node.nextSibling().firstChild();
-            int x1 = node.toElement().text().toInt();
-            node = node.nextSibling();
-            int y1 = node.toElement().text().toInt();
-            node = node.nextSibling();
-            int x2 = node.toElement().text().toInt();
-            node = node.nextSibling();
-            int y2 = node.toElement().text().toInt();
-            Food objFood(x1,y1,x2,y2,name);
-            classList.append(objFood);
-
-            if(ui->checkBox_rect_3->isChecked())
-            {
-                QPen pen(QColor(255,y1%255,y2%255), 3);
-                painter.setPen(pen);
-                painter.drawRect(x1,y1,x2-x1,y2-y1);
-
-                if(ui->checkBox_label_3->isChecked())
-                {
-                    QFont font;
-                    font.setFamily("Microsoft YaHei");
-                    font.setPointSize(20);
-                    font.setItalic(true);
-                    painter.setFont(font);
-                    painter.drawText(QRect(x1,y1,150,30),Qt::AlignLeft,name);
-                }
-            }
-
-            objectNode = objectNode.nextSibling();
-        }
-        painter.end();
+        Food food = list.at( iter );
+        QListWidgetItem *it1 = new QListWidgetItem(QString::number(food.x1_)+" "
+                                               +QString::number(food.y1_)+" "
+                                               +QString::number(food.x2_)+" "
+                                               +QString::number(food.y2_)+" "
+                                               +food.name_) ;
+        ui->listWidget->insertItem(iter,it1);
     }
-    else if(ui->radioButton_txt->isChecked())
-    {
-
-        QString name = imgName.split('.').at(0).trimmed();
-        QString annoFileName = AnnoDir_3 + "/" + name + ".txt";
-        cout<< annoFileName.toStdString() <<endl;
-        QFile annoFile(annoFileName);
-
-        if(!annoFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            cout << AnnoDir_3.toStdString()<<endl;
-            cout <<annoFileName.toStdString()<< " Open failed." << endl;
-//            QMessageBox::warning(NULL,"open","open file failed");
-            QImage image = src.scaled(Image_Width,Image_Height,Qt::KeepAspectRatio);
-            ui->label_fullImage_3->setPixmap(QPixmap::fromImage( image ));
-            ui->name1_3->setText(imgName);
-            return ;
-        }
-        QTextStream txtInput(&annoFile);
-        txtInput.setCodec("UTF-8");
-        QString lineStr;
-        QList<Food> classList;
-        int num = txtInput.readLine().trimmed().toInt();
-        QPainter painter(&src);
-
-        if (num > 0)
-        {
-            while( ! txtInput.atEnd() )
-            {
-
-                lineStr = txtInput.readLine();
-                QList<QString> lineDate= lineStr.split(' ');
-                int x1 = lineDate.at(0).trimmed().toInt();
-                int y1 = lineDate.at(1).trimmed().toInt();
-                int x2 = lineDate.at(2).trimmed().toInt();
-                int y2 = lineDate.at(3).trimmed().toInt();
-                QString classname = lineDate.at(4).trimmed();
-                Food objFood(x1,y1,x2,y2,classname);
-                classList.append(objFood);
-
-                if(ui->checkBox_rect_3->isChecked())
-                {
-                    QPen pen(QColor(255,y1%255,y2%255), 3);
-                    painter.setPen(pen);
-                    painter.drawRect(x1,y1,x2-x1,y2-y1);
-
-                    if(ui->checkBox_label_3->isChecked())
-                    {
-                        QFont font;
-                        font.setFamily("Microsoft YaHei");
-                        font.setPointSize(20);
-                        font.setItalic(true);
-                        painter.setFont(font);
-                        painter.drawText(QRect(x1,y1,150,30),Qt::AlignLeft,classname);
-                    }
-                }
-
-            }
-            painter.end();
-        }
-
-
-    }
-
-     QImage image = src.scaled(Image_Width,Image_Height,Qt::KeepAspectRatio);
-     ui->label_fullImage_3->setPixmap(QPixmap::fromImage( image ));
-     ui->name1_3->setText(imgName);
+    mybbox->paintObjects(ui->checkBox_rect_3->isChecked(),ui->checkBox_label_3->isChecked());
+    QImage image = mybbox->printImage().scaled(Image_Width,Image_Height);
+    ui->label_fullImage_3->setPixmap(QPixmap::fromImage( image ));
 
 }
 
@@ -572,6 +455,24 @@ void Dialog::on_upper_3_clicked()
     start_num_3--;
     if(start_num_3 < 0)
         start_num_3 = 0;
+
+    QFileInfo qfile = fileInfo->at(start_num_3);
+    QString filename = qfile.absoluteFilePath();
+    QImage src = QImage(filename);
+    QString imgName = qfile.fileName();
+    QString name = imgName.split('.').at(0).trimmed();
+
+    QString annoFileName;
+    if (ui->radioButton_xml->isChecked())
+        annoFileName = AnnoDir_3 + "/" + name + ".xml";
+    else
+        annoFileName = AnnoDir_3 + "/" + name + ".txt";
+    mybbox = new bbox(src, annoFileName);
+    ui->name1_3->setText(imgName);
+    ind = -1;
+    ui->pushButton->setEnabled(false);
+
+
     showImage_3();
     ui->lineEdit_NUM_3->setText(QString::number(start_num_3, 10));
 
@@ -582,6 +483,183 @@ void Dialog::on_next_3_clicked()
     start_num_3++;
     if(start_num_3 > all_num_3)
         start_num_3 = all_num_3;
+
+    QFileInfo qfile = fileInfo->at(start_num_3);
+    QString filename = qfile.absoluteFilePath();
+    QImage src = QImage(filename);
+    QString imgName = qfile.fileName();
+    QString name = imgName.split('.').at(0).trimmed();
+
+    QString annoFileName;
+    if (ui->radioButton_xml->isChecked())
+        annoFileName = AnnoDir_3 + "/" + name + ".xml";
+    else
+        annoFileName = AnnoDir_3 + "/" + name + ".txt";
+    mybbox = new bbox(src, annoFileName);
+    ui->name1_3->setText(imgName);
+    ind = -1;
+    ui->pushButton->setEnabled(false);
+
     showImage_3();
     ui->lineEdit_NUM_3->setText(QString::number(start_num_3, 10));
+}
+
+void Dialog::on_listWidget_itemClicked(QListWidgetItem *item)
+{
+
+
+}
+
+void Dialog::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
+{
+
+}
+
+void Dialog::on_listWidget_clicked(const QModelIndex &index)
+{
+    QList<Food> list;
+    mybbox->getList(list);
+    ind = index.row();
+    if (ind >=0)
+        ui->pushButton->setEnabled(true);
+    else
+        ui->pushButton->setEnabled(false);
+    QImage part = mybbox->getSubImage(ind)
+            .scaled(ui->label_part_3->width(),ui->label_part_3->height(),Qt::KeepAspectRatio);
+    ui->label_part_3->setPixmap(QPixmap::fromImage( part ));
+
+}
+
+void Dialog::on_listWidget_doubleClicked(const QModelIndex &index)
+{
+    QList<Food> list;
+    mybbox->getList(list);
+    ind = index.row();
+
+    if (ind >=0)
+        ui->pushButton->setEnabled(true);
+    else
+        ui->pushButton->setEnabled(false);
+
+    Food food = list.at(ind);
+    QString classname = food.name_;
+    if (classname.split('_').last() == "hard")
+        food.name_ = classname.split('_')[0];
+    else
+        food.name_ = food.name_+"_hard";
+    mybbox->modObject(ind,food);
+
+    QImage part = mybbox->getSubImage(ind)
+            .scaled(ui->label_part_3->width(),ui->label_part_3->height(),Qt::KeepAspectRatio);
+    ui->label_part_3->setPixmap(QPixmap::fromImage( part ));
+
+    showImage_3();
+
+}
+
+void Dialog::on_pushButton_clicked()
+{
+    if (ind >= 0 )
+    {
+        if (QMessageBox::question(this,"删除","确定删除?",QMessageBox::Yes|QMessageBox::No,
+                                  QMessageBox::Yes) == QMessageBox::Yes)
+        {
+            mybbox->deleteObject(ind);
+            ui->label_part_3->clear();
+            ui->pushButton->setEnabled(false);
+            ind = -1;
+        }
+    }
+
+    showImage_3();
+}
+
+void Dialog::on_pushButton_saveLabel_clicked()
+{
+
+    QFileInfo qfile = fileInfo->at(start_num_3);
+    QString imgName = qfile.fileName();
+    QString name = imgName.split('.').at(0).trimmed();
+
+    QString annoFileName;
+    if (ui->radioButton_xml->isChecked())
+    {
+        annoFileName = AnnoDir_3 + "/" + name + ".xml";
+    }
+    else if(ui->radioButton_txt->isChecked())
+    {
+        annoFileName = AnnoDir_3 + "/" + name + ".txt";
+        QFile savefile(annoFileName);
+        if(!savefile.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            QMessageBox::warning(NULL,"open","open file failed");
+            return ;
+        }
+        QTextStream txtOutput(&savefile);
+        txtOutput.setCodec("UTF-8");
+        QList <Food > list;
+        mybbox->getList(list);
+        txtOutput<< list.size() <<endl;
+        for (int i = 0; i < list.size() ; i++)
+        {
+            Food food = list.at(i);
+            txtOutput<<food.x1_<<" "<<food.y1_<<" "<<food.x2_<<" "<<food.y2_<<" "<<food.name_<<endl;
+        }
+        savefile.close();
+
+    }
+
+}
+
+void Dialog::on_tableWidget_clicked(const QModelIndex &index)
+{
+    int row = index.row();
+    int column = index.column();
+    word_taked_ = words_.at(column*ui->tableWidget->rowCount()+row);
+    qDebug()<<word_taked_<<endl;
+}
+
+void Dialog::mousePressEvent(QMouseEvent *event)
+{
+    if ( event->button()== Qt::LeftButton )
+    {
+        if ( (ui->label_fullImage_3->x() <= event->x() < ui->label_fullImage_3->x()+ ui->label_fullImage_3->width())
+             && (ui->label_fullImage_3->y() <= event->y() < ui->label_fullImage_3->y()+ ui->label_fullImage_3->height()) )
+
+        {
+            start_ = QPoint(event->x(),event->y());
+            qDebug()<<"start:"<<start_<<endl;
+        }
+    }
+
+}
+
+void Dialog::mouseReleaseEvent(QMouseEvent *event){
+    int x,y;
+    if ( (event->x() > start_.x()) && (event->y() > start_.y()) )
+    {
+        if ( event->x() > ui->label_fullImage_3->x()+ ui->label_fullImage_3->width() )
+            x = ui->label_fullImage_3->x()+ ui->label_fullImage_3->width()-1;
+        else
+            x = event->x();
+        if (event->y()>=300)
+            y = 300-3;
+        else
+            y = event->y();
+    }
+    else
+    {
+        start_= QPoint(-1,-1);
+
+    }
+
+    end = QPoint(x,y);
+
+    qDebug()<<"end:"<<end<<endl;
+    rects.push_back(QRect(start,end));
+    QImage temp = src;
+    QPainter painter(&temp);
+    painter.drawRects(rects);
+    ui->label->setPixmap(QPixmap::fromImage(temp));
+
 }

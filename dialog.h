@@ -2,11 +2,17 @@
 #define DIALOG_H
 #include <QDialog>
 #include <QDir>
+#include <QListWidgetItem>
+#include <bbox.h>
+#include <QList>
+#include <QMouseEvent>
 using namespace std;
 
 namespace Ui {
 class Dialog;
 }
+
+
 
 class Dialog : public QDialog
 {
@@ -21,6 +27,10 @@ public:
     void showImage_3();
     void delete_object(int startNum);
     void showFullImage(int startNum);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+
 
 private slots:
     void on_load_clicked();
@@ -61,6 +71,20 @@ private slots:
 
     void on_next_3_clicked();
 
+    void on_listWidget_itemClicked(QListWidgetItem *item);
+
+    void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
+
+    void on_listWidget_clicked(const QModelIndex &index);
+
+    void on_listWidget_doubleClicked(const QModelIndex &index);
+
+    void on_pushButton_clicked();
+
+    void on_pushButton_saveLabel_clicked();
+
+    void on_tableWidget_clicked(const QModelIndex &index);
+
 private:
     Ui::Dialog *ui;
     QString imageDir;
@@ -77,6 +101,16 @@ private:
     int all_num_3;
     QList<QFileInfo> *fileInfo;
     QDir *mydir;
+    bbox *mybbox;
+    int ind; //foodlist's index now
+    QList<QString> words_;
+
+    // draw rect
+    QPoint start_;
+    QPoint end_;
+    QString word_taked_;
+
+
 
 };
 
