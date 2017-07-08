@@ -623,9 +623,10 @@ void Dialog::mousePressEvent(QMouseEvent *event)
 {
     if ( event->button()== Qt::LeftButton )
     {
-        if ( (ui->label_fullImage_3->x() <= event->x() < ui->label_fullImage_3->x()+ ui->label_fullImage_3->width())
-             && (ui->label_fullImage_3->y() <= event->y() < ui->label_fullImage_3->y()+ ui->label_fullImage_3->height()) )
-
+        if ( (ui->label_fullImage_3->x() <= event->x())
+             && ( event->x() < ui->label_fullImage_3->x()+ ui->label_fullImage_3->width())
+             && (ui->label_fullImage_3->y() <= event->y())
+             && (event->y()  < ui->label_fullImage_3->y()+ ui->label_fullImage_3->height()) )
         {
             start_ = QPoint(event->x(),event->y());
             qDebug()<<"start:"<<start_<<endl;
@@ -636,30 +637,43 @@ void Dialog::mousePressEvent(QMouseEvent *event)
 
 void Dialog::mouseReleaseEvent(QMouseEvent *event){
     int x,y;
-    if ( (event->x() > start_.x()) && (event->y() > start_.y()) )
+    if ( (event->x() > start_.x()) && (event->y() > start_.y()) && (start_.x() != -1 ))
     {
         if ( event->x() > ui->label_fullImage_3->x()+ ui->label_fullImage_3->width() )
             x = ui->label_fullImage_3->x()+ ui->label_fullImage_3->width()-1;
         else
             x = event->x();
-        if (event->y()>=300)
-            y = 300-3;
+        if (  event->y() > ui->label_fullImage_3->y()+ ui->label_fullImage_3->height() )
+            y =  ui->label_fullImage_3->y() + ui->label_fullImage_3->height() -1 ;
         else
             y = event->y();
+        end_ = QPoint(x, y);
     }
     else
     {
         start_= QPoint(-1,-1);
-
+        return;
     }
 
-    end = QPoint(x,y);
+    qDebug()<<"end:"<<end_<<endl;
+    if (word_taked_.isNull()){
+        start_ = QPoint(-1,-1);
+        end_ = QPoint(-1,-1);
+        return;
+    }
 
-    qDebug()<<"end:"<<end<<endl;
-    rects.push_back(QRect(start,end));
-    QImage temp = src;
-    QPainter painter(&temp);
-    painter.drawRects(rects);
-    ui->label->setPixmap(QPixmap::fromImage(temp));
+    int src_width = mybbox->width();
+    int src_height = mybbox->height();
+    double wRatio = 1.0*src_width/ui->label_fullImage_3->width();
+    double hRatio = 1.0*src_height/ui->label_fullImage_3->height();
+
+    Food food( int(start_.x()*wRatio),int(start_.y()*hRatio),
+               int(end_.x()*wRatio),int(end_.y()*hRatio), word_taked_ );
+    mybbox->addObject(food);
+    showImage_3();
+}
+
+void Dialog::mouseMoveEvent(QMouseEvent *event)
+{
 
 }

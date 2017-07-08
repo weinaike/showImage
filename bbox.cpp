@@ -13,6 +13,8 @@ bbox::bbox(QImage src, QString annoFileName){
     src_image_ = src.copy(src.rect());
     show_image_ = src_image_.copy(src_image_.rect());
     getObjects(annoFileName);
+    imageWidth_ = src.width();
+    imageHeight_ = src.height();
 }
 
 void bbox::getObjects(QString annoFileName){
@@ -164,4 +166,15 @@ void bbox::getList(QList<Food> &list)
     }
 
 }
+
+int bbox::width()
+{
+    return imageWidth_;
+
+}
+int bbox::height()
+{
+    return imageHeight_;
+}
+
 

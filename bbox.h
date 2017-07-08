@@ -17,12 +17,15 @@ public:
     QImage printImage();
     QImage getSubImage(int iter);
     void getList(QList<Food> &list);
+    int width();
+    int height();
 private:
     QList<Food> foodList_;
     QList<QString> words;
     QImage src_image_;
     QImage show_image_;
-
+    int imageWidth_;
+    int imageHeight_;
 };
 
 #endif // BBOX_H
