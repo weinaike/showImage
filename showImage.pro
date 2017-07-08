@@ -14,11 +14,18 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         dialog.cpp \
+    bbox.cpp \
+    food.cpp
 
 HEADERS  += dialog.h \
+    bbox.h \
+    food.h
 
 FORMS    += dialog.ui
 
 RC_FILE +=rcfile.rc
+
+DISTFILES += \
+    foodlist.txt
 
 
