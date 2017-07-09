@@ -25,11 +25,20 @@
    <property name="autoFillBackground">
     <bool>true</bool>
    </property>
+   <property name="tabPosition">
+    <enum>QTabWidget::South</enum>
+   </property>
    <property name="tabShape">
     <enum>QTabWidget::Triangular</enum>
    </property>
    <property name="currentIndex">
     <number>2</number>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
    </property>
    <property name="elideMode">
     <enum>Qt::ElideNone</enum>
@@ -1269,7 +1278,7 @@
       <string>保存标注</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="checkBox">
+    <widget class="QCheckBox" name="checkBox_labeling">
      <property name="geometry">
       <rect>
        <x>882</x>

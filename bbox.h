@@ -19,6 +19,7 @@ public:
     void getList(QList<Food> &list);
     int width();
     int height();
+    int size();
 private:
     QList<Food> foodList_;
     QList<QString> words;

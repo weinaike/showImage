@@ -119,6 +119,7 @@ void bbox::modObject(int iter, Food newFood){
 
 void bbox::paintObjects( bool IsShowBBOX, bool IsShowName )
 {
+    show_image_ = src_image_.copy(src_image_.rect());
 
     if ( IsShowBBOX )
     {
@@ -175,6 +176,11 @@ int bbox::width()
 int bbox::height()
 {
     return imageHeight_;
+}
+
+int bbox::size()
+{
+    return foodList_.size();
 }
 
 

@@ -621,37 +621,45 @@ void Dialog::on_tableWidget_clicked(const QModelIndex &index)
 
 void Dialog::mousePressEvent(QMouseEvent *event)
 {
+    qDebug()<<"press:"<<event->pos()<<endl;
     if ( event->button()== Qt::LeftButton )
     {
-        if ( (ui->label_fullImage_3->x() <= event->x())
-             && ( event->x() < ui->label_fullImage_3->x()+ ui->label_fullImage_3->width())
-             && (ui->label_fullImage_3->y() <= event->y())
-             && (event->y()  < ui->label_fullImage_3->y()+ ui->label_fullImage_3->height()) )
+        int x = event->x() - ui->label_fullImage_3->x();
+        int y = event->y() - ui->label_fullImage_3->y();
+        if ( (x >= 0) && ( x < ui->label_fullImage_3->width())
+             && ( y >=0 ) && ( y < ui->label_fullImage_3->height()) )
         {
-            start_ = QPoint(event->x(),event->y());
+            start_ = QPoint(x, y);
             qDebug()<<"start:"<<start_<<endl;
+        }
+        else
+        {
+            start_ = QPoint(-1, -1);
         }
     }
 
 }
 
 void Dialog::mouseReleaseEvent(QMouseEvent *event){
-    int x,y;
-    if ( (event->x() > start_.x()) && (event->y() > start_.y()) && (start_.x() != -1 ))
+    if ( ! ui->checkBox_labeling->isChecked())
+        return;
+    int x = event->x() - ui->label_fullImage_3->x();
+    int y = event->y() - ui->label_fullImage_3->y();
+
+    if ( ( x > start_.x()) && ( y > start_.y()) && (start_.x() != -1 ))
     {
-        if ( event->x() > ui->label_fullImage_3->x()+ ui->label_fullImage_3->width() )
-            x = ui->label_fullImage_3->x()+ ui->label_fullImage_3->width()-1;
-        else
-            x = event->x();
-        if (  event->y() > ui->label_fullImage_3->y()+ ui->label_fullImage_3->height() )
-            y =  ui->label_fullImage_3->y() + ui->label_fullImage_3->height() -1 ;
-        else
-            y = event->y();
+
+        if ( x > ui->label_fullImage_3->width() )
+            x = ui->label_fullImage_3->width();
+        if ( y > ui->label_fullImage_3->height() )
+            y = ui->label_fullImage_3->height();
+
         end_ = QPoint(x, y);
     }
     else
     {
         start_= QPoint(-1,-1);
+        end_ = QPoint(-1,-1);
         return;
     }
 
@@ -675,5 +683,56 @@ void Dialog::mouseReleaseEvent(QMouseEvent *event){
 
 void Dialog::mouseMoveEvent(QMouseEvent *event)
 {
+    int x = event->x() - ui->label_fullImage_3->x();
+    int y = event->y() - ui->label_fullImage_3->y();
+//    if ( x >= 0 && x <= ui->label_fullImage_3->width()
+//         && y >=0 && y < ui->label_fullImage_3->height())
+//        this->setCursor(Qt::CrossCursor);
+//    else
+//        this->setCursor(Qt::ArrowCursor);
 
+    if ( ! ui->checkBox_labeling->isChecked() || start_.x() == -1 )
+        return;
+
+//    int x = event->x() - ui->label_fullImage_3->x();
+//    int y = event->y() - ui->label_fullImage_3->y();
+    end_ = QPoint(x,y);
+
+    qDebug()<<"end:"<<end_<<endl;
+    if (word_taked_.isNull()){
+        start_ = QPoint(-1,-1);
+        end_ = QPoint(-1,-1);
+        QMessageBox::warning(NULL,"提醒","未选择类别");
+        return;
+    }
+
+    int src_width = mybbox->width();
+    int src_height = mybbox->height();
+    double wRatio = 1.0*src_width/ui->label_fullImage_3->width();
+    double hRatio = 1.0*src_height/ui->label_fullImage_3->height();
+    qDebug()<<start_.x()<<"   "<<start_.x()*wRatio << int(start_.x()*wRatio)<<endl;
+
+    Food food( int(start_.x()*wRatio),int(start_.y()*hRatio),
+               int(end_.x()*wRatio),int(end_.y()*hRatio), word_taked_ );
+
+    if ( (end_.x() > start_.x()) || (end_.y() > start_.y()))
+    {
+        mybbox->addObject(food);
+        int num = mybbox->size();
+        showImage_3();
+        mybbox->deleteObject(num-1);
+    }
+
+}
+
+void Dialog::on_checkBox_labeling_clicked()
+{
+//    if(ui->checkBox_labeling->isChecked())
+//    {
+//        setMouseTracking(true);
+//    }
+//    else
+//    {
+//        setMouseTracking(false);
+//    }
 }

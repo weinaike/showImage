@@ -85,6 +85,8 @@ private slots:
 
     void on_tableWidget_clicked(const QModelIndex &index);
 
+    void on_checkBox_labeling_clicked();
+
 private:
     Ui::Dialog *ui;
     QString imageDir;
