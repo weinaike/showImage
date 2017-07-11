@@ -643,7 +643,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>\\WEINAIKE\FFOutput\AAA\classes-mid-bak\黄瓜</string>
+      <string>\\WEINAIKE\FFOutput\AAA\classes-mid-bak\蒜苔</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_11">
@@ -784,7 +784,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>621</y>
+       <y>611</y>
        <width>91</width>
        <height>20</height>
       </rect>
@@ -797,7 +797,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>591</y>
+       <y>581</y>
        <width>81</width>
        <height>16</height>
       </rect>
@@ -810,33 +810,33 @@
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>620</y>
+       <y>610</y>
        <width>321</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>E:\data\JoyData\Joyshow\Annotations</string>
+      <string>\\WEINAIKE\FFOutput\AAA\Annotations</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineEdit_DIR_3">
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>590</y>
+       <y>580</y>
        <width>321</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>E:\data\JoyData\Joyshow\JPEGImages</string>
+      <string>\\WEINAIKE\FFOutput\AAA\JPEGImages</string>
      </property>
     </widget>
     <widget class="QPushButton" name="upper_3">
      <property name="geometry">
       <rect>
        <x>253</x>
-       <y>650</y>
+       <y>640</y>
        <width>75</width>
        <height>23</height>
       </rect>
@@ -849,7 +849,7 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>680</y>
+       <y>670</y>
        <width>61</width>
        <height>21</height>
       </rect>
@@ -865,7 +865,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>680</y>
+       <y>670</y>
        <width>41</width>
        <height>21</height>
       </rect>
@@ -878,7 +878,7 @@
      <property name="geometry">
       <rect>
        <x>160</x>
-       <y>650</y>
+       <y>640</y>
        <width>75</width>
        <height>23</height>
       </rect>
@@ -891,7 +891,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>650</y>
+       <y>640</y>
        <width>61</width>
        <height>21</height>
       </rect>
@@ -903,8 +903,8 @@
     <widget class="QPushButton" name="next_3">
      <property name="geometry">
       <rect>
-       <x>345</x>
-       <y>650</y>
+       <x>340</x>
+       <y>640</y>
        <width>75</width>
        <height>23</height>
       </rect>
@@ -917,7 +917,7 @@
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>650</y>
+       <y>640</y>
        <width>61</width>
        <height>21</height>
       </rect>
@@ -933,7 +933,7 @@
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>720</y>
+       <y>710</y>
        <width>91</width>
        <height>16</height>
       </rect>
@@ -949,7 +949,7 @@
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>750</y>
+       <y>740</y>
        <width>91</width>
        <height>16</height>
       </rect>
@@ -981,7 +981,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>710</y>
+       <y>700</y>
        <width>101</width>
        <height>61</height>
       </rect>
@@ -1268,7 +1268,7 @@
     <widget class="QPushButton" name="pushButton_saveLabel">
      <property name="geometry">
       <rect>
-       <x>880</x>
+       <x>340</x>
        <y>680</y>
        <width>75</width>
        <height>23</height>

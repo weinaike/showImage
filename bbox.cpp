@@ -11,7 +11,7 @@ bbox::bbox(){
 
 bbox::bbox(QImage src, QString annoFileName){
     src_image_ = src.copy(src.rect());
-    show_image_ = src_image_.copy(src_image_.rect());
+//    show_image_ = src_image_.copy(src_image_.rect());
     getObjects(annoFileName);
     imageWidth_ = src.width();
     imageHeight_ = src.height();
@@ -117,9 +117,10 @@ void bbox::modObject(int iter, Food newFood){
 }
 
 
-void bbox::paintObjects( bool IsShowBBOX, bool IsShowName )
+QImage bbox::paintObjects( bool IsShowBBOX, bool IsShowName )
 {
-    show_image_ = src_image_.copy(src_image_.rect());
+//    show_image_.~QImage();
+    QImage show_image_ = src_image_.copy(src_image_.rect());
 
     if ( IsShowBBOX )
     {
@@ -147,10 +148,7 @@ void bbox::paintObjects( bool IsShowBBOX, bool IsShowName )
             }
         }
     }
-}
 
-QImage bbox::printImage()
-{
     return show_image_;
 }
 

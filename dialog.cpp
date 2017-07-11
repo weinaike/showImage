@@ -25,7 +25,7 @@ Dialog::Dialog(QWidget *parent) :
     mybbox = new bbox();
     ind = -1;
     ui->pushButton->setEnabled(false);
-    QFile wordsfile("D:\\work\\showImage\\foodlist.txt");
+    QFile wordsfile("foodlist.txt");
     if (wordsfile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QTextStream txtInput(&wordsfile);
@@ -272,7 +272,7 @@ void Dialog::on_load_2_clicked()
     start_num_2 = ui->lineEdit_NUM_2->text().toInt();
     mydir = new QDir(imageDir_2);
     QStringList filter;
-    filter<<"*.jpg";
+    filter<<"*.jpg"<<"*.JPEG"<<"*.png";
     mydir->setNameFilters(filter);
     fileInfo = new  QList<QFileInfo>(mydir->entryInfoList(filter));
     all_num_2 = fileInfo->count();
@@ -444,9 +444,8 @@ void Dialog::showImage_3()
                                                +food.name_) ;
         ui->listWidget->insertItem(iter,it1);
     }
-    mybbox->paintObjects(ui->checkBox_rect_3->isChecked(),ui->checkBox_label_3->isChecked());
-    QImage image = mybbox->printImage().scaled(Image_Width,Image_Height);
-    ui->label_fullImage_3->setPixmap(QPixmap::fromImage( image ));
+    QImage image = mybbox->paintObjects(ui->checkBox_rect_3->isChecked(),ui->checkBox_label_3->isChecked());
+    ui->label_fullImage_3->setPixmap(QPixmap::fromImage( image.scaled(Image_Width,Image_Height) ));
 
 }
 
@@ -561,14 +560,14 @@ void Dialog::on_pushButton_clicked()
 {
     if (ind >= 0 )
     {
-        if (QMessageBox::question(this,"删除","确定删除?",QMessageBox::Yes|QMessageBox::No,
-                                  QMessageBox::Yes) == QMessageBox::Yes)
-        {
+//        if (QMessageBox::question(this,"删除","确定删除?",QMessageBox::Yes|QMessageBox::No,
+//                                  QMessageBox::Yes) == QMessageBox::Yes)
+//        {
             mybbox->deleteObject(ind);
             ui->label_part_3->clear();
             ui->pushButton->setEnabled(false);
             ind = -1;
-        }
+//        }
     }
 
     showImage_3();
@@ -608,6 +607,7 @@ void Dialog::on_pushButton_saveLabel_clicked()
         savefile.close();
 
     }
+    ui->name1_3->setText("保存成功");
 
 }
 
