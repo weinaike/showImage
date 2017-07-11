@@ -8,7 +8,8 @@ class bbox
 {
 public:
     bbox();
-    bbox(QImage src, QString annoFileName );
+    ~bbox();
+    bbox(const QImage & src, const QString & annoFileName );
     void getObjects( QString annoFileName );
     QImage paintObjects(bool IsShowBBOX, bool IsShowName);
     void deleteObject( int iter );

@@ -417,6 +417,7 @@ void Dialog::on_load_3_clicked()
         annoFileName = AnnoDir_3 + "/" + name + ".xml";
     else
         annoFileName = AnnoDir_3 + "/" + name + ".txt";
+    delete mybbox;
     mybbox = new bbox(src, annoFileName);
     ui->name1_3->setText(imgName);
     ind = -1;
@@ -466,6 +467,7 @@ void Dialog::on_upper_3_clicked()
         annoFileName = AnnoDir_3 + "/" + name + ".xml";
     else
         annoFileName = AnnoDir_3 + "/" + name + ".txt";
+    delete mybbox;
     mybbox = new bbox(src, annoFileName);
     ui->name1_3->setText(imgName);
     ind = -1;
@@ -494,7 +496,9 @@ void Dialog::on_next_3_clicked()
         annoFileName = AnnoDir_3 + "/" + name + ".xml";
     else
         annoFileName = AnnoDir_3 + "/" + name + ".txt";
-    mybbox = new bbox(src, annoFileName);
+
+    delete mybbox;
+    mybbox =new  bbox(src, annoFileName);
     ui->name1_3->setText(imgName);
     ind = -1;
     ui->pushButton->setEnabled(false);

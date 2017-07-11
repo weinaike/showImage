@@ -9,8 +9,11 @@ bbox::bbox(){
 
 }
 
-bbox::bbox(QImage src, QString annoFileName){
-    src_image_ = src.copy(src.rect());
+bbox::~bbox(){
+}
+
+bbox::bbox(const QImage & src, const QString & annoFileName){
+    src_image_ = src;
 //    show_image_ = src_image_.copy(src_image_.rect());
     getObjects(annoFileName);
     imageWidth_ = src.width();
@@ -65,6 +68,7 @@ void bbox::getObjects(QString annoFileName){
             Food objFood(x1,y1,x2,y2,name);
             foodList_.append(objFood);
         }
+        xmlfile.close();
 
     }
     else if( extend == "txt")
@@ -97,6 +101,7 @@ void bbox::getObjects(QString annoFileName){
                 foodList_.append(objFood);
             }
         }
+        annoFile.close();
     }
 
 
